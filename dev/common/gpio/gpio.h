@@ -5,7 +5,7 @@
 \brief      GPIO pin configuration and output control.
 
 \author     Z. BEN-AKKA
-\version    1.0
+\version    1.1
 \date       12/11/2026
 
 \details
@@ -16,6 +16,7 @@
 | Version | Date       | Author      | Description            |
 |:-------:|:----------:|:------------|:-----------------------|
 | 1.0     | 12/11/2026 | Z. BEN-AKKA | Initial version.       |
+| 1.1     | 12/11/2026 | Z. BEN-AKKA | Add GpioSetAf().       |
 ****************************
 */
 
@@ -29,6 +30,14 @@
 \param  port  Port base address.
 */
 void GpioEnableClock(uint32_t port);
+
+/*!
+\brief  Configure a pin as alternate function, very high speed.
+\param  port  Port base address.
+\param  pin   Pin number, 0 to 15.
+\param  af    Alternate function number, 0 to 15 (GPIO_AF_* in mcu.h).
+*/
+void GpioSetAf(uint32_t port, uint32_t pin, uint32_t af);
 
 /*!
 \brief  Configure a pin as a push-pull output.
