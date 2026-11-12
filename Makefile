@@ -5,7 +5,7 @@
 # \brief      Build and flash project images for a board.
 #
 # \author     Z. BEN-AKKA
-# \version    1.1
+# \version    1.2
 # \date       12/11/2026
 #
 # \details
@@ -24,6 +24,7 @@
 # |:-------:|:----------:|:------------|:-----------------|
 # | 1.0     | 12/11/2026 | Z. BEN-AKKA | Initial version. |
 # | 1.1     | 12/11/2026 | Z. BEN-AKKA | Add 02-uart.     |
+# | 1.2     | 12/11/2026 | Z. BEN-AKKA | Add 03-clock.    |
 # ****************************
 # */
 
@@ -57,12 +58,13 @@ include $(BOARD_DIR)/board.mk
 # One image each, named after the application. <image>_MODULES lists the
 # dev/common/<module>/<module>.c files it links, on top of the board sources.
 # <image>_MEMORY picks one of the board's memories (default: the board's).
-SINGLE := 01-blink 02-uart
+SINGLE := 01-blink 02-uart 03-clock
 $(foreach a,$(SINGLE),$(eval $(a)_IMAGES := $(a)))
 $(foreach a,$(SINGLE),$(eval $(a)_SRCS := $(APPS_DIR)/$(a)/main.c))
 
 01-blink_MODULES := delay gpio led
 02-uart_MODULES  := delay gpio led uart
+03-clock_MODULES := delay gpio led rcc uart
 
 APPS   := $(SINGLE)
 IMAGES := $(foreach a,$(APPS),$($(a)_IMAGES))
@@ -151,7 +153,7 @@ reset:
 help:
 	@echo "Usage: make [BOARD=<name>] <target>"
 	@echo ""
-	@echo "Per application (01-blink, 02-uart):"
+	@echo "Per application (01-blink, 02-uart, 03-clock):"
 	@echo "  <app>                build it"
 	@echo "  <app>-flash          build and flash with the ST-LINK"
 	@echo "  <app>-clean          remove its build outputs"
