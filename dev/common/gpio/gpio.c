@@ -5,7 +5,7 @@
 \brief      GPIO pin configuration and output control.
 
 \author     Z. BEN-AKKA
-\version    1.0
+\version    1.1
 \date       12/11/2026
 
 \details
@@ -16,6 +16,7 @@
 | Version | Date       | Author      | Description            |
 |:-------:|:----------:|:------------|:-----------------------|
 | 1.0     | 12/11/2026 | Z. BEN-AKKA | Initial version.       |
+| 1.1     | 12/11/2026 | Z. BEN-AKKA | Add GpioSetAf().       |
 ****************************
 */
 
@@ -30,6 +31,22 @@ void GpioEnableClock(uint32_t port)
   // Ports are 0x400 apart from GPIOA, and their enable bits follow the same order
   RCC_AHB1ENR.raw |= 1U << ((port - GPIOA_BASE) / 0x400U);
   (void)RCC_AHB1ENR.raw; // read back: the clock reaches the port
+}
+
+void GpioSetAf(uint32_t port, uint32_t pin, uint32_t af)
+{
+  uint32_t af_shift = (pin % 8U) * 4U; // four AF bits per pin, AFRL for 0-7, AFRH for 8-15
+  uint32_t shift = pin * 2U;           // two speed and mode bits per pin
+
+  // Function and speed first, so the pin drives the right signal once in AF mode
+  if (pin < 8U) {
+    GPIO_AFRL(port).raw = (GPIO_AFRL(port).raw & ~(0xFU << af_shift)) | (af << af_shift);
+  } else {
+    GPIO_AFRH(port).raw = (GPIO_AFRH(port).raw & ~(0xFU << af_shift)) | (af << af_shift);
+  }
+  GPIO_OSPEEDR(port).raw =
+      (GPIO_OSPEEDR(port).raw & ~(3U << shift)) | (GPIO_SPEED_VERY_HIGH << shift);
+  GPIO_MODER(port).raw = (GPIO_MODER(port).raw & ~(3U << shift)) | (GPIO_MODE_AF << shift);
 }
 
 void GpioSetOutput(uint32_t port, uint32_t pin)
